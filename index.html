@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<title>FUN PALACE - COMIC STRIP MAKER</title>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	
+	<script src="http://code.createjs.com/easeljs-0.5.0.min.js"></script> 
+	<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+
+	<script src="libs/export_canvas/base64.js" type="text/javascript"></script>
+	<script src="libs/export_canvas/canvas2image.js" type="text/javascript"></script>
+    
+    <link rel=stylesheet href="style.css" type="text/css" >
+    
+    <link href='https://fonts.googleapis.com/css?family=Londrina+Solid' rel='stylesheet' type='text/css'>
+
+</head>
+
+<script type="text/javascript">
+	
+	var canvas;
+	var stage;
+	var txt;
+	var target;
+	var bin;
+	var masks = new Array();
+	var texts = new Array();
+	var clones = new Array();
+	var logo, dragText, deleteText;
+
+	/**
+	 * Init 
+	 */
+	function init() {
+		
+		canvas = document.getElementById("canvas");
+		stage = new createjs.Stage(canvas);
+		stage.enableMouseOver();
+
+		// Enable touch support
+		if (createjs.Touch.isSupported()) { createjs.Touch.enable(stage); }
+
+		displayThumbnails();
+		displayBin ();
+		displayFrames ();
+		displayDroptext ();
+		displaySequencetext ();
+		displayLogo ();
+
+		sortObjectOrder ();
+	
+	}
+
+	/**
+	 * Display Label
+	 */
+	function createText () {
+
+		// Create a new Text object and a rectangle Shape object, and position them inside a container
+		var container = new createjs.Container();
+		container.x = 660;
+		container.y = 620;
+		container.rotation = 0;	
+
+		txt = new createjs.Text(document.getElementById('text_add').value, "20px Arial", "#000");
+		txt.font = "20px Londrina Solid"; 
+		txt.textBaseline = "top";
+
+		container.addChild(txt);
+
+		texts.push (container);
+
+		stage.addChild(container);
+
+		// Enable drag'n'drop
+		enableDrag(container);
+		stage.update ();
+
+	}
+	
+	
+	displayMasks = function () {
+
+		masks[1] = new createjs.Shape();
+		masks[1].graphics.beginFill("#FFF").drawRect(0,0, 1280, 108);
+		stage.addChild(masks[1]);
+		
+		masks[2] = new createjs.Shape();
+		masks[2].graphics.beginFill("#FFF").drawRect(0,0, 37, 348);
+		stage.addChild(masks[2]);
+
+		masks[3] = new createjs.Shape();
+		masks[3].graphics.beginFill("#FFF").drawRect(260,0, 22, 348);
+		stage.addChild(masks[3]);
+
+		masks[4] = new createjs.Shape();
+		masks[4].graphics.beginFill("#FFF").drawRect(505,0, 22, 348);
+		stage.addChild(masks[4]);
+
+		masks[5] = new createjs.Shape();
+		masks[5].graphics.beginFill("#FFF").drawRect(750,0, 22, 348);
+		stage.addChild(masks[5]);
+
+		masks[6] = new createjs.Shape();
+		masks[6].graphics.beginFill("#FFF").drawRect(995,0, 21, 348);
+		stage.addChild(masks[6]);
+
+		masks[7] = new createjs.Shape();
+		masks[7].graphics.beginFill("#FFF").drawRect(1239,0, 41, 348);
+		stage.addChild(masks[7]);
+
+		masks[8] = new createjs.Shape();
+		masks[8].graphics.beginFill("#FFF").drawRect(0,331, 1280, 27);
+		stage.addChild(masks[8]);		
+
+		
+
+		stage.update();							
+		
+	}
+
+	function sortObjectOrder ()
+	{
+		for (i = 0; i < clones.length; i++)
+		{
+			stage.addChild (clones[i]);
+		}
+
+		stage.addChild(bin);
+		stage.addChild(deleteText);
+		stage.addChild(dragText);
+
+		for (i = 0; i <= masks.length; i++)
+		{
+			stage.addChild(masks[i]);
+		}
+
+		stage.addChild(logo);
+
+
+
+
+		for (i = 0; i < texts.length; i++)
+		{
+			stage.addChild (texts[i]);
+		}
+
+		stage.update();
+	}
+	
+	/**
+	 * Display Images
+	 */
+	displayThumbnails = function () {
+
+		var images = ["1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png", "9.png", "10.png", "11.png", "12.png", "13.png", "14.png", "15.png", "16.png", "17.png", "18.png", "19.png", "20.png", "21.png", "22.png", "23.png", "24.png", "25.png", "26.png", "27.png", "28.png", "29.png"];
+		var xPos = 30;
+		var yPos = 0;
+		var thumbs = 0;
+		var prevImage = null;
+
+		for (i = 0; i < images.length; i++)
+		{
+			var image = new Image();
+			
+			if (i >= 16) yPos = 85;
+
+			// Invoked when the picture is loaded
+			image.onload = function (event) {
+
+				if (prevImage) xPos += 85; //event.target.width;
+				thumbs++;
+
+				// Display
+				var img = new createjs.Bitmap(event.target) ;
+				
+				stage.addChild(img);
+				
+				img.scaleX = .5;
+				img.scaleY = .5;
+
+				if (thumbs > 16) { 
+					img.y = 430 + yPos;
+				}
+				else if (thumbs == 16)
+				{
+					img.y = 430 + yPos;
+					xPos = 30;
+				}
+				else img.y = 430;
+
+				img.x = xPos;
+				//img.y = canvas.height - img.height;
+
+				prevImage = event.target;
+				stage.update();
+				// Enable drag'n'drop on Picture
+				enableDragClone(img);
+				
+			}
+			image.src = "images/" + images[i];
+		}
+	}
+
+	displayBin = function () {
+		var image = new Image ();
+
+		image.onload = function (event) {
+			var img = new createjs.Bitmap (event.target);
+			img.y = 350;
+			img.x = 1185;
+			stage.addChild (img);
+			stage.update();
+
+			bin = img;
+
+		}
+		image.src = "images/bin.png";
+	}
+	
+	displayLogo = function () {
+		var image = new Image ();
+
+		image.onload = function (event) {
+			var img = new createjs.Bitmap (event.target);
+			img.x = 640 - 175;
+			img.y = 10;
+
+			logo = img;
+
+			stage.addChild (img);
+			stage.update();
+
+		}
+		image.src = "images/fp_logo.png";
+	}
+	
+	displayFrames = function () {
+		var image = new Image ();
+
+		image.onload = function (event) {
+			var img = new createjs.Bitmap (event.target);
+			img.y = 90;
+			stage.addChild (img);
+			displayMasks ();
+			stage.update();
+
+		}
+		image.src = "images/frames.jpg";
+	}
+	
+	displayDroptext = function () {
+		var image = new Image ();
+
+		image.onload = function (event) {
+			var img = new createjs.Bitmap (event.target);
+			img.y = 350;
+			img.x = 960;
+			stage.addChild (img);
+
+			deleteText = img;
+			stage.update();
+
+		}
+		image.src = "images/drop_text.png";
+	}
+	
+	displaySequencetext = function () {
+		var image = new Image ();
+
+		image.onload = function (event) {
+			var img = new createjs.Bitmap (event.target);
+			img.y = 353;
+			img.x = 0;
+
+			dragText = img;
+			stage.addChild (img);
+			stage.update();
+
+		}
+		image.src = "images/dragdrop_sequence_text.png";
+	}
+
+	createImageInstance = function (original) {
+		var img = new createjs.Bitmap (original);
+
+		stage.addChild (img);
+
+		stage.update ();
+	}
+
+
+	deleteClone = function (clone) {
+		stage.removeChild (clone);
+
+		var n = clones.indexOf (clone);
+		clones.splice(n,1);
+
+		stage.update ();
+	}
+
+	/**
+     * Enable drag'n'drop on DisplayObjects
+     */
+
+    enableDragClone = function (item) {
+
+    	// OnPress event handler
+		item.onPress = function(evt) {
+
+			var clone = item.clone();
+
+			clone.scaleX = 1;
+			clone.scaleY = 1;
+
+			enableDrag (clone);
+
+			clones.push (clone);
+		
+			var offset = {	x:clone.x-evt.stageX, y:clone.y-evt.stageY};
+
+			// Bring to front
+			stage.addChild(clone);
+
+			// Mouse Move event handler
+			evt.onMouseMove = function(ev) {
+				
+				clone.x = ev.stageX+offset.x;
+				clone.y = ev.stageY+offset.y;
+
+				//sortObjectOrder();
+
+				stage.addChild(clone);
+
+				stage.update();
+			}
+
+			evt.onMouseUp = function (ev) {
+				
+				sortObjectOrder();
+
+				if (Math.abs(clone.x - bin.x) < 50 && Math.abs(clone.y - bin.y) < 50) {
+					deleteClone (clone);
+				}
+			}
+		}
+    }
+
+	enableDrag = function (clone) {
+			// Mouse Move event handler
+			clone.onPress = function(evt) {
+
+				var offset = {	x:clone.x-evt.stageX, y:clone.y-evt.stageY};
+
+				//sortObjectOrder();
+
+				evt.onMouseMove = function(ev) {
+					
+					clone.x = ev.stageX+offset.x;
+					clone.y = ev.stageY+offset.y;
+					stage.addChild(clone);
+					//sortObjectOrder();
+					stage.update();
+				}
+
+				evt.onMouseUp = function (ev) {
+
+					stage.addChild(clone);
+					sortObjectOrder();
+
+					if (Math.abs(clone.x - bin.x) < 50 && Math.abs(clone.y - bin.y) < 50) {
+						deleteClone (clone);
+					}
+				}
+			}
+	}
+
+	/**
+     * Export and save the canvas as PNG 
+     */
+	function exportAndSaveCanvas()  {
+
+		// Get the canvas screenshot as PNG
+		var screenshot = Canvas2Image.saveAsPNG(canvas, true, canvas.width, canvas.height, canvas.width, 358);
+
+		// This is a little trick to get the SRC attribute from the generated <img> screenshot
+		canvas.parentNode.appendChild(screenshot);
+		screenshot.id = "canvasimage";		
+		data = $('#canvasimage').attr('src');
+		canvas.parentNode.removeChild(screenshot);
+
+
+		// Send the screenshot to PHP to save it on the server
+		var url = 'upload/export.php';
+		$.ajax({ 
+		    type: "POST", 
+		    url: url,
+		    dataType: 'text',
+		    data: {
+		        base64data : data
+		    },
+		    success: function() {
+			    window.location.href = "success.html";
+			}
+		});
+
+		//window.location.replace("success.html");
+	}
+
+	/**
+     * Export and display the canvas as PNG in a new wind	ow
+     */
+	function exportAndView()  {
+
+		var screenshot = Canvas2Image.saveAsPNG(canvas, true, canvas.width, canvas.height, canvas.width, 358);
+		var win = window.open();
+		$(win.document.body).html(screenshot );
+	}
+
+	function confirmSave ()
+	{
+		if (confirm('Are you sure you want to Submit your comic?')) {
+		    // Save it!
+		    exportAndSaveCanvas();
+		} else {
+		    // Do nothing
+		}
+	}
+
+
+
+	
+</script>
+	
+<body onload="init()"  >
+
+<div id="canvas_container">
+
+		<canvas  width="1280" height="650" id="canvas"></canvas>
+		
+		
+
+	<div id="button_container" >
+		<input id="button_submit" type="button" value="Submit" onClick="confirmSave()" />
+        <input id="button_preview" type="button" value="Preview" onClick="exportAndView()" />
+	</div>
+
+
+	<input id="text_add" type="text" /><input id="button_create" type="button" value="Insert Caption" onClick="createText()" />
+    
+    <div class="credits">
+<span style="color:#e0003f;">Fun Palaces Comic Maker</span>
+<br />
+Concept by Matt Finch
+<br />
+Based on Panel Lottery by Jessica Abel and Matt Madden
+<br />
+Design and development by Phil Gullberg and Talia Yat
+</div>
+<div class="credits">
+<br />
+  Hosting courtesy of <a href="http://www.bookswarm.co.uk" target="_blank">Bookswarm.co.uk</a><br />
+  Thanks to: Daniel Flood, Stella Duffy, Sandy Mahal, <br />
+  Zoey Dixon, 
+  Sarah-Jane Rawlings, Hannah Lambert,<br />Kirsty Lothian
+</div>
+
+</div>
+
+	
+</body>
+</html>
