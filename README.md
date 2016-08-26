@@ -1,1 +1,1 @@
-# Fun-Palaces-Comic-Maker
+Fun-Palaces-Comic-Maker
