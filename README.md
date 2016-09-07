@@ -11,7 +11,7 @@ Uses the following, do as you please...
 
 This drag and drop comic maker was created by the State Library of Queensland for [Fun Palaces](www.funpalaces.co.uk).
 
-It's from a concept by [Matt Finch](www.matthewfinch.me/about) who devised a physical [comic book dice game](https://matthewfinch.me/2014/10/14/comic-book-dice-a-sequential-storytelling-game/) at the Museum of Contemporary Art and Design in Manila, Philippines.
+It's from a concept by [Matt Finch](www.matthewfinch.me/about) who devised a physical [comic book dice game](https://matthewfinch.me/2014/10/14/comic-book-dice-a-sequential-storytelling-game/) at the Museum of Contemporary Art and Design in Manila, Philippines. The game was designed by Phil Gullberg and Talia Yat of [The Edge at State Library of Queensland](http://edgeqld.org.au/).
 
 Comic Book Dice was inspired by Jessica Abel and Matt Madden's comic-making activity [Panel Lottery](http://dw-wp.com/2010/05/panel-lottery-an-exercise-in-narrative-juxtaposition-and-editing/), which in turn has roots in the work of Scott McCloud. Comic book games have their own art history!
 
